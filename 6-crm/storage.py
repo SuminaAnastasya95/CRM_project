@@ -1,3 +1,6 @@
+"""Работа с JSON"""
+
+
 def load():
     pass
 
