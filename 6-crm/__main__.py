@@ -1,15 +1,17 @@
 """Точка входа"""
 
-from orders import create_order, list_orders
+from orders import create_order, list_orders, edit_order, remove_order
 
 
 def start_menu():
-    print("Что вы хотите сделать?\n"
-          "Создать заказ? Команда -> create\n"
-          "Показать лист заказов? Команда -> list\n"
-          "Изменить заказ? Команда -> edit\n"
-          "Удалить заказ? Команда -> delete\n"
-          "Выход? Команда -> exit")
+    print("""
+Что вы хотите сделать?
+Создать заказ?         Команда -> create
+Показать лист заказов? Команда -> list
+Изменить заказ?        Команда -> edit
+Удалить заказ?         Команда -> delete
+Выход?                 Команда -> exit
+    """)
     while True:
         menu = input(">>> ").strip()
         match menu:
@@ -17,12 +19,11 @@ def start_menu():
                 create_order()
             case "list":
                 list_orders()
-            # case 'edit':
-                # edit_order()
-        #     continue
-        # if menu == 'delete':
-        #     remove_order()
-        #     continue
+            case 'edit':
+                edit_order()
+            case 'delete':
+                remove_order()
+
             case 'exit':
                 print("Завершение программы...")
                 exit()
