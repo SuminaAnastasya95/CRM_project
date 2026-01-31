@@ -2,7 +2,7 @@
 
 from datetime import datetime, date, timezone
 from typing import TypedDict, Optional
-
+from cli import pars_date
 
 STATUS = ['new', 'in_progress', 'done', 'cancelled']
 
@@ -38,3 +38,35 @@ def make_order(id_: int, title: str, amount: float, email: str, due:  datetime, 
         'closed_at':  closed_at.strftime("%Y-%m-%d %H:%M:%S") if closed_at else None
     }
     return order
+
+
+def make_edit(orders_dict: dict, choice_order: int, change: str):
+    order = orders_dict[choice_order]
+    new_val = str(
+        input("На какое значение, хотите изменить?>>> "))
+    match change:
+        case "title" | "email" | "status":
+            order[change] = new_val
+            print(order[change])
+        case "amount":
+            try:
+                order["amount"] = float(new_val.replace(",", '.'))
+            except ValueError as e:
+                print("Значение должно быть числом")
+        case "tags":
+            new_tags = {t.strip() for t in new_val.split(",")}
+            kind = input("Изменить/ добавить?>>> ").lower()
+            if kind == "изменить" and order["tags"]:
+                order["tags"].update(new_tags)
+            else:
+                order["tags"] = new_tags
+        case "due":
+            try:
+                order["due"] = pars_date(new_val).strftime("%Y-%m-%d")
+            except ValueError:
+                print("Не верный формат даты")
+    print(f"✅ Обновленный заказ: {order}")
+
+
+# if __name__ == "__main__":
+#     make_edit()
