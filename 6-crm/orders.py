@@ -60,20 +60,16 @@ def edit_order():
 
 def remove_order():
     """Удаление заказа"""
-    print("---Какой заказ хотите удалить---")
-    for o_id, data in orders_dict.items():
-        print(
-            f"Номер заказа - {o_id}, Название - {data["title"]}, Статус - {data["status"]}")
-        try:
-            order_id = int(input("Введите номер заказа, который хотите изменить?\n"
-                                 ">>> "))
-            if order_id not in orders_dict:
-                print("❌Данный номер заказа отсутствует")
-                return
-            del orders_dict[order_id]
-            print(f"Заказ #{order_id} успешно удален.")
-        except ValueError:
-            print("Ошибка данных")
+    try:
+        order_id = int(input("Введите номер заказа, который хотите удалить?\n"
+                             ">>> "))
+        if order_id not in orders_dict:
+            print("❌Данный номер заказа отсутствует")
+            return
+        del orders_dict[order_id]
+        print(f"Заказ #{order_id} успешно удален.")
+    except ValueError:
+        print("Ошибка данных")
 
 
 # if __name__ == "__main__":
