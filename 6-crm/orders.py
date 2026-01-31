@@ -30,8 +30,18 @@ def create_order():
     return new_order
 
 
+def get_all_orders():
+    return orders_dict
+
+
 def list_orders():
-    return print("Перечень заказов: ", orders_dict)
+    orders = get_all_orders()
+    if not orders:
+        print("Список пуст")
+        return
+    for o_id, data in orders_dict.items():
+        print(
+            f"Номер заказа - {o_id}, Название - {data["title"]}, Статус - {data["status"]}")
 
 
 def edit_order():

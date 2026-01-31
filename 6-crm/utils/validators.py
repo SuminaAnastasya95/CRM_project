@@ -50,13 +50,13 @@ def make_edit(orders_dict: dict, choice_order: int, change: str):
             print(order[change])
         case "amount":
             try:
-                order["amount"] = float(new_val.replace(".", ','))
+                order["amount"] = float(new_val.replace(",", '.'))
             except ValueError as e:
                 print("Значение должно быть числом")
         case "tags":
             new_tags = {t.strip() for t in new_val.split(",")}
             kind = input("Изменить/ добавить?>>> ").lower()
-            if kind == "Изменить" and order["tags"]:
+            if kind == "изменить" and order["tags"]:
                 order["tags"].update(new_tags)
             else:
                 order["tags"] = new_tags
