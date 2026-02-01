@@ -21,7 +21,7 @@ def load(path: str):
     max_id = 0
 
     # ИСПРАВЛЕНО: Используем ключ 'orders' (соответствует функции save)
-    for item in raw.get('orders', []):
+    for item in raw.get('order', []):
         try:
             order_item: Order = {
                 "id": int(item["id"]),
@@ -42,10 +42,10 @@ def load(path: str):
     return orders_list, max_id + 1
 
 
-def save(path, orders):
+def save(path, order):
     # ИСПРАВЛЕНО: Ключ 'orders' теперь един для записи и чтения
     data = {
-        'orders': [{
+        'order': [{
             'id': o['id'],
             'title': o['title'],
             'amount': o['amount'],
@@ -55,7 +55,7 @@ def save(path, orders):
             'due': o.get('due'),
             'created_at': o.get('created_at'),
             'closed_at': o.get('closed_at')
-        } for o in orders]
+        } for o in order]
     }
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
