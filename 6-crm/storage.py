@@ -15,10 +15,10 @@ def load(path: str):  # 1. Добавлен путь
         print(f'[WARN] - Поврежденный JSON ({path}) : {e}')
         return [], 1  # Важно вернуть значения, если файл битый
 
-    orders: list[Order] = []
+    order: list[Order] = []
     max_id = 0
 
-    for item in raw.get('orders', []):
+    for item in raw.get('order', []):
         try:
             order: Order = {
                 "id": int(item["id"]),
@@ -28,18 +28,18 @@ def load(path: str):  # 1. Добавлен путь
                 "status": item["status"],
                 "tags": list(item.get("tags", [])),  # 2. Исправлено здесь
                 'created_at': pars_date(item.get("due")) if item.get("due") else None,
-                'due': str(t['due']) if t.get("due") else None,
+                'due': str(item['due']) if item.get("due") else None,
                 'closed_at': pars_date(item.get("closed_at")) if item.get("closed_at") else None
             }
-            orders.append(order)
+            order.append(order)
             max_id = max(max_id, order["id"])
         except Exception as e:
             print(f"[WARN] - пропущена задача: {e}")
 
-    return orders, max_id + 1
+    return order, max_id + 1
 
 
-def save(path, orders):  # Добавили аргументы
+def save(path, order):  # Добавили аргументы
     data = {
         'order': [{
             'id': t['id'],
@@ -51,7 +51,7 @@ def save(path, orders):  # Добавили аргументы
             # Здесь используем формат (в строку), а не парс
             'due': pars_date(t['due']) if t.get("due") else None
         }
-            for t in orders
+            for t in order
         ]
     }
     with open(path, 'w', encoding='utf-8') as f:
