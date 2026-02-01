@@ -9,12 +9,11 @@ def load(path: str):
     try:
         with open(path, "r", encoding='utf-8') as f:
             raw = json.load(f)
-    except FileNotFoundError:
+    except FileNotFoundError:  # ✅ Отдельная обработка для отсутствующего файла
         return [], 1
-    except json.JSONDecodeError:
-        # ТРЕБОВАНИЕ ВЫПОЛНЕНО: Понятное сообщение выводится
+    except json.JSONDecodeError:  # ✅ Отдельная обработка для повреждённого JSON
         print(
-            f"⚠️ Ошибка: файл {path} поврежден или содержит некорректный JSON. Загружен пустой список.")
+            f"⚠️ Ошибка: файл '{path}' содержит некорректный JSON. Возвращаем пустой список.")
         return [], 1
 
     orders_list: list[Order] = []
