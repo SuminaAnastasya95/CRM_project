@@ -10,18 +10,18 @@ def load(path: str):
         with open(path, "r", encoding='utf-8') as f:
             raw = json.load(f)
     except FileNotFoundError:
-        # Это штатная ситуация, сообщение не требуется
+        # Это норма при первом запуске, сообщение не нужно
         return [], 1
-    except json.JSONDecodeError as e:
-        # Выполняем требование по понятному сообщению
+    except json.JSONDecodeError:
+        # ТРЕБОВАНИЕ: вывод понятного сообщения при повреждении
         print(
-            f"⚠️ Файл {path} поврежден или имеет неверный формат: {e}. Начинаем с пустого списка.")
+            f"⚠️ Ошибка: файл {path} поврежден или содержит некорректный JSON. Начинаем с чистого листа.")
         return [], 1
 
     orders_list: list[Order] = []
     max_id = 0
 
-    # Исправлено: теперь ключ 'orders' совпадает в load и save
+    # РЕШЕНИЕ: Ключ синхронизирован ('orders'), теперь данные подгрузятся
     for item in raw.get('orders', []):
         try:
             order_item: Order = {
@@ -37,15 +37,16 @@ def load(path: str):
             }
             orders_list.append(order_item)
             max_id = max(max_id, order_item["id"])
-        except (KeyError, TypeError, ValueError) as e:
-            print(f"[WARN] - Пропущена запись из-за ошибки в данных: {e}")
+        except (KeyError, ValueError, TypeError) as e:
+            print(f"[WARN] - Пропущена некорректная запись в JSON: {e}")
 
     return orders_list, max_id + 1
 
 
 def save(path, orders):
     data = {
-        'orders': [{  # Ключ синхронизирован с методом load
+        # РЕШЕНИЕ: ключ 'orders' во множественном числе, как в методе load
+        'orders': [{
             'id': o['id'],
             'title': o['title'],
             'amount': o['amount'],
@@ -57,8 +58,5 @@ def save(path, orders):
             'closed_at': o.get('closed_at')
         } for o in orders]
     }
-    try:
-        with open(path, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
-    except Exception as e:
-        print(f"[ERROR] - Не удалось сохранить файл: {e}")
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
