@@ -7,7 +7,7 @@ from utils.validators import make_order, make_edit
 orders_dict = {}
 
 
-def create_order():
+def create_order(next_id):
     """Создание заказа"""
     order = input("Что было заказано?\n>>> ")
     item_order = [item.strip() for item in order.split(',')]
@@ -27,7 +27,7 @@ def create_order():
     )
     orders_dict[new_id] = new_order
     print(f"Заказ #{new_id} успешно добавлен!")
-    return new_order
+    return new_order, next_id + 1
 
 
 def get_all_orders():
