@@ -12,7 +12,7 @@ def load(path: str):
     except FileNotFoundError:
         return [], 1
     except json.JSONDecodeError:
-        # РЕШЕНИЕ: Вывод понятного сообщения согласно требованию
+        # ИСПРАВЛЕНО: Теперь выводится понятное сообщение согласно требованию
         print(
             f"⚠️ Ошибка: файл {path} поврежден или содержит некорректный JSON. Загружен пустой список.")
         return [], 1
@@ -20,7 +20,7 @@ def load(path: str):
     orders_list: list[Order] = []
     max_id = 0
 
-    # РЕШЕНИЕ: Ключ 'orders' (множественное число) теперь совпадает и в load, и в save
+    # ИСПРАВЛЕНО: Используем ключ 'orders' (соответствует функции save)
     for item in raw.get('orders', []):
         try:
             order_item: Order = {
@@ -37,14 +37,14 @@ def load(path: str):
             orders_list.append(order_item)
             max_id = max(max_id, order_item["id"])
         except (KeyError, ValueError, TypeError) as e:
-            print(f"[WARN] - Пропущена некорректная запись: {e}")
+            print(f"[WARN] - Пропущена некорректная запись в файле: {e}")
 
     return orders_list, max_id + 1
 
 
 def save(path, orders):
+    # ИСПРАВЛЕНО: Ключ 'orders' теперь един для записи и чтения
     data = {
-        # РЕШЕНИЕ: Ключ 'orders' синхронизирован с загрузкой
         'orders': [{
             'id': o['id'],
             'title': o['title'],
