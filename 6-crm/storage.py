@@ -4,12 +4,15 @@ from utils.validators import Order
 from cli import pars_date
 
 
-def load(path: str):  # 1. Добавлен путь
+def load(path: str):
     raw = {}
     try:
         with open(path, "r", encoding='utf-8') as f:
             raw = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
+    except FileNotFoundError:
+        return [], 1
+    except json.JSONDecodeError as e:
+        print(f"⚠️ Ошибка чтения JSON: файл повреждён ({e})")
         return [], 1
 
     orders_list: list[Order] = []
@@ -36,21 +39,20 @@ def load(path: str):  # 1. Добавлен путь
     return orders_list, max_id + 1
 
 
-def save(path, orders):
+def save(path, orders_to_save):  # Переименовал аргумент для ясности
     data = {
-        'orders': [{  # Используем множественное число для ключа
+        # ИСПРАВЛЕНО: Ключ 'orders' теперь совпадает с загрузкой
+        'orders': [{
             'id': o['id'],
             'title': o['title'],
             'amount': o['amount'],
             'email': o['email'],
             'status': o['status'],
             'tags': o['tags'],
-            # 2. Просто берем строку, JSON не примет объект date
             'due': o.get('due'),
-            # 3. Добавляем недостающие поля для персистентности
             'created_at': o.get('created_at'),
             'closed_at': o.get('closed_at')
-        } for o in orders]
+        } for o in orders_to_save]
     }
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
