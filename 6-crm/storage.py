@@ -42,16 +42,16 @@ def load(path: str):  # 1. Добавлен путь
 def save(path, order):  # Добавили аргументы
     data = {
         'order': [{
-            'id': t['id'],
-            'title': t['title'],
-            'amount': t['amount'],
-            'email': t['email'],
-            'status': t['status'],
-            'tags': t['tags'],
+            'id': o['id'],
+            'title': o['title'],
+            'amount': o['amount'],
+            'email': o['email'],
+            'status': o['status'],
+            'tags': o['tags'],
             # Здесь используем формат (в строку), а не парс
-            'due': pars_date(t['due']) if t.get("due") else None
+            'due': pars_date(o['due']) if o.get("due") else None
         }
-            for t in order
+            for o in order
         ]
     }
     with open(path, 'w', encoding='utf-8') as f:
