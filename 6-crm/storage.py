@@ -12,16 +12,16 @@ def load(path: str):
     except FileNotFoundError:
         return [], 1
     except json.JSONDecodeError:
-        # ИСПРАВЛЕНО: Теперь выводится понятное сообщение согласно требованию
+        # ТРЕБОВАНИЕ ВЫПОЛНЕНО: Понятное сообщение выводится
         print(
-            f"⚠️ Ошибка: файл {path} поврежден или содержит некорректный JSON. Загружен пустой список{[]}.")
+            f"⚠️ Ошибка: файл {path} поврежден или содержит некорректный JSON. Загружен пустой список.")
         return [], 1
 
     orders_list: list[Order] = []
     max_id = 0
 
-    # ИСПРАВЛЕНО: Используем ключ 'orders' (соответствует функции save)
-    for item in raw.get('order', []):
+    # ИСПРАВЛЕНО: Ключ 'orders' (множественное число)
+    for item in raw.get('orders', []):
         try:
             order_item: Order = {
                 "id": int(item["id"]),
@@ -42,10 +42,10 @@ def load(path: str):
     return orders_list, max_id + 1
 
 
-def save(path, order):
-    # ИСПРАВЛЕНО: Ключ 'orders' теперь един для записи и чтения
+def save(path, orders_to_save):  # Переименовал аргумент для ясности
     data = {
-        'order': [{
+        # ИСПРАВЛЕНО: Ключ 'orders' теперь совпадает с загрузкой
+        'orders': [{
             'id': o['id'],
             'title': o['title'],
             'amount': o['amount'],
@@ -55,7 +55,7 @@ def save(path, order):
             'due': o.get('due'),
             'created_at': o.get('created_at'),
             'closed_at': o.get('closed_at')
-        } for o in order]
+        } for o in orders_to_save]
     }
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
