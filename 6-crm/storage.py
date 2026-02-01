@@ -9,50 +9,48 @@ def load(path: str):  # 1. Добавлен путь
     try:
         with open(path, "r", encoding='utf-8') as f:
             raw = json.load(f)
-    except FileNotFoundError:
+    except (FileNotFoundError, json.JSONDecodeError):
         return [], 1
-    except json.JSONDecodeError as e:
-        print(f'[WARN] - Поврежденный JSON ({path}) : {e}')
-        return [], 1  # Важно вернуть значения, если файл битый
 
-    order: list[Order] = []
+    orders_list: list[Order] = []
     max_id = 0
 
-    for item in raw.get('order', []):
+    for item in raw.get('orders', []):
         try:
-            order: Order = {
+            order_item: Order = {
                 "id": int(item["id"]),
                 "title": item["title"],
-                "amount": float(item.get("amount", 0)),  # .get безопаснее
+                "amount": float(item.get("amount", 0)),
                 "email": item.get("email", ""),
                 "status": item["status"],
-                "tags": list(item.get("tags", [])),  # 2. Исправлено здесь
-                'created_at': pars_date(item.get("due")) if item.get("due") else None,
-                'due': str(item['due']) if item.get("due") else None,
-                'closed_at': pars_date(item.get("closed_at")) if item.get("closed_at") else None
+                "tags": list(item.get("tags", [])),
+                'created_at': item.get("created_at"),
+                'due': item.get("due"),
+                'closed_at': item.get("closed_at")
             }
-            order.append(order)
-            max_id = max(max_id, order["id"])
+            orders_list.append(order_item)
+            max_id = max(max_id, order_item["id"])
         except Exception as e:
-            print(f"[WARN] - пропущена задача: {e}")
+            print(f"[WARN] - пропущена запись: {e}")
 
-    return order, max_id + 1
+    return orders_list, max_id + 1
 
 
-def save(path, order):  # Добавили аргументы
+def save(path, orders):
     data = {
-        'order': [{
+        'orders': [{  # Используем множественное число для ключа
             'id': o['id'],
             'title': o['title'],
             'amount': o['amount'],
             'email': o['email'],
             'status': o['status'],
             'tags': o['tags'],
-            # Здесь используем формат (в строку), а не парс
-            'due': pars_date(o['due']) if o.get("due") else None
-        }
-            for o in order
-        ]
+            # 2. Просто берем строку, JSON не примет объект date
+            'due': o.get('due'),
+            # 3. Добавляем недостающие поля для персистентности
+            'created_at': o.get('created_at'),
+            'closed_at': o.get('closed_at')
+        } for o in orders]
     }
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
