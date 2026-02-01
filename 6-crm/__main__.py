@@ -7,43 +7,61 @@ from utils.validators import Order
 
 def start_menu():
     print("""
-Что вы хотите сделать?
-Создать заказ?         Команда -> create
-Показать лист заказов? Команда -> list
-Изменить заказ?        Команда -> edit
-Удалить заказ?         Команда -> delete
-Выход?                 Команда -> exit
+==== CRM Система ====
+Доступные команды:
+create - Создать заказ
+list   - Показать все заказы
+edit   - Изменить заказ
+delete - Удалить заказ
+exit   - Сохранить и выйти
     """)
-    orders: list[Order] = []
-    next_id = 1
-    file_orders = 'order.json'
-    orders, next_id = load(file_orders)
+
     file_path = 'order.json'
+    # 1. Загружаем данные при старте
+    orders, next_id = load(file_path)
+
     try:
         while True:
-            menu = input(">>> ").strip()
+            menu = input("\n>>> ").strip().lower()
+
             match menu:
                 case "create":
+                    # Получаем новый заказ и обновленный счетчик ID
                     new_order, next_id = create_order(next_id)
                     orders.append(new_order)
+                    print(f"✅ Заказ №{new_order['id']} добавлен в список.")
+
                 case "list":
-                    list_orders()
+                    # Передаем текущие заказы для отображения
+                    list_orders(orders)
+
                 case 'edit':
-                    edit_order()
+                    # Передаем список и сохраняем результат редактирования
+                    orders = edit_order(orders)
+
                 case 'delete':
-                    remove_order()
+                    # Передаем список и сохраняем результат после удаления
+                    orders = remove_order(orders)
 
                 case 'exit':
+                    # Сохраняем перед выходом
                     save(file_path, orders)
-                    print("Завершение программы...")
-                    exit()
+                    print("💾 Изменения сохранены. До свидания!")
+                    break
+
                 case _:
-                    print("Не знаю такой команды")
+                    print("❓ Неизвестная команда. Введите help для справки.")
+
     except KeyboardInterrupt:
+        # Сохранение при принудительном закрытии (Ctrl+C)
+        print("\n\n⚠️ Прерывание пользователем...")
         save(file_path, orders)
+        print("💾 Данные экстренно сохранены.")
+
     except Exception as e:
+        # Ловим критические ошибки, чтобы не потерять данные
+        print(f"💥 Критическая ошибка: {e}")
         save(file_path, orders)
-        print("[ERROR] - ", e)
 
 
 if __name__ == "__main__":
